@@ -67,8 +67,9 @@ conCourses.sort(function(a,b){
 for (const course of conCourses){
   console.log(course.name);
   console.log("lesTijd:  " + milisToHours(course.totalTime)+"u");
-  console.log("onCampus: " + milisToHours(course.onCampusTime)+"u");
-  console.log("offCampus:" + milisToHours(course.offCampusTime)+"u");
+  for (const room in course.rooms){
+    console.log(room + ": " + milisToHours(course.rooms[room])+"u");
+  }
 }
 
 function milisToHours(milis){
@@ -137,16 +138,18 @@ function CourseSummary(course){
   this.name = course.course;
   this.totalTime = 0;
   this.onCampusTime = 0;
+  this.rooms = new Object();
   this.offCampusTime = 0;
   this.events = course.events;
   for (event of this.events){
     let time = event.end.getTime()-event.start.getTime();
     this.totalTime += time
     if (event.location != null){
-      if (event.location.includes("OP_AFSTAND"))
-        this.offCampusTime += time;
-      else
-        this.onCampusTime += time;
+      if (!this.rooms[event.location]){
+        this.rooms[event.location] = 0
+      }
+
+      this.rooms[event.location] += time
     }
     else
       this.unKnownTime += time;
